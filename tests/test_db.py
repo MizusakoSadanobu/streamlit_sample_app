@@ -3,6 +3,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from db import Base, init_db
 from models import User, Property, Booking, Review
+from datetime import date  # 追加
 
 # テスト用のSQLiteデータベースを使用
 TEST_DATABASE_URL = "sqlite:///:memory:"
@@ -54,7 +55,7 @@ def test_booking_creation(session):
     session.commit()
 
     # ブッキングを作成
-    booking = Booking(user_id=user.id, property_id=property.id, date="2024-12-01")
+    booking = Booking(user_id=user.id, property_id=property.id, date=date(2024, 12, 1))  # 修正
     session.add(booking)
     session.commit()
 
@@ -73,7 +74,7 @@ def test_review_creation(session):
     session.commit()
 
     # レビューを作成
-    review = Review(user_id=user.id, property_id=property.id, review_text="Great place!", date="2024-12-02")
+    review = Review(user_id=user.id, property_id=property.id, review_text="Great place!", date=date(2024, 12, 2))  # 修正
     session.add(review)
     session.commit()
 
