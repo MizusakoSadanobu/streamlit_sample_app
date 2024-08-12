@@ -7,6 +7,9 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     username = Column(String, unique=True)
     password = Column(String)
+    properties = relationship("Property", back_populates="owner")
+    bookings = relationship("Booking", back_populates="user")
+    reviews = relationship("Review", back_populates="user")
 
 class Property(Base):
     __tablename__ = 'properties'
@@ -17,6 +20,8 @@ class Property(Base):
     availability = Column(Boolean, default=True)
     owner_id = Column(Integer, ForeignKey('users.id'))
     owner = relationship("User", back_populates="properties")
+    bookings = relationship("Booking", back_populates="property")
+    reviews = relationship("Review", back_populates="property")
 
 class Booking(Base):
     __tablename__ = 'bookings'
