@@ -37,23 +37,20 @@ def user_auth():
 
 # 宿の検索
 def search_properties():
-    location = st.selectbox("Location", session.query(Property.location).distinct().all())
-    date_input = st.date_input("Date", min_value=date.today())
-    price_range = st.slider("Price Range", 0, 500, (50, 300))
+    location = st.selectbox("Select location", ["Tokyo", "Osaka", "Kyoto"])
+    start_date = st.date_input("Start date")
+    end_date = st.date_input("End date")
+    min_price, max_price = st.slider("Price range", min_value=0, max_value=1000, value=(50, 300))
     
-    results = session.query(Property).filter(Property.location == location, Property.price.between(*price_range)).all()
-    st.write(f"Found {len(results)} properties")
-    for prop in results:
-        st.write(f"Name: {prop.name}, Price: {prop.price}, Available: {prop.availability}")
-        if st.button(f"Book {prop.name}"):
-            if st.session_state.logged_in:
-                new_booking = Booking(user_id=session_state.username, property_id=prop.id, date=date_input)
-                prop.availability = False
-                session.add(new_booking)
-                session.commit()
-                st.success("Booking confirmed")
-            else:
-                st.error("You need to login first")
+    # 修正ポイント: BETWEEN句に個別の値を渡す
+    properties = session.query(Property).filter(
+        Property.location == location,
+        Property.price.between(min_price, max_price)
+    ).all()
+    
+    st.write(f"Found {len(properties)} properties")
+    for property in properties:
+        st.write(f"Name: {property.name}, Price: {property.price}, Available: {property.availability}")
 
 # メインページ
 def main():
@@ -71,7 +68,7 @@ def main():
             price = st.number_input("Price")
             location = st.text_input("Location")
             if st.button("Add"):
-                new_property = Property(name=name, price=price, location=location, owner_id=session_state.username)
+                new_property = Property(name=name, price=price, location=location, owner_id=st.session_state.username)
                 session.add(new_property)
                 session.commit()
                 st.success("Property added successfully")
